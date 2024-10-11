@@ -40,7 +40,7 @@ class Fleet(Sprite):
         alien_width = alien.rect.width
         current_x = alien_width 
         while current_x < (self.settings.scr_width - self.spacing * alien_width):
-             new_alien = Alien(self, v=self.v)
+             new_alien = Alien(self.ai_game, v=self.v)
              new_alien.rect.y = y
              new_alien.y = y
              new_alien.x = current_x
