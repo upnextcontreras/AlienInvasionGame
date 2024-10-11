@@ -25,7 +25,7 @@ class AlienInvasion:
         self.sound = Sound()
 
         self.ship = Ship(ai_game=self)
-        self.fleet = Fleet(ai_game=self)
+        self.fleet = Fleet(ai_game=self)  # Instantiate AlienFleet instead of Fleet
         self.ship.set_fleet(self.fleet)
         self.ship.set_sb(self.sb)
         self.barriers = Barriers(ai_game=self)
@@ -109,8 +109,10 @@ class AlienInvasion:
         self.sound.play_background()
 
         self.ship.reset_ship()
-        self.fleet.reset_fleet()
+        self.fleet.aliens.empty()
+        self.fleet.create_fleet()  # Reset the alien fleet
         pg.mouse.set_visible(False)
+
 
     def restart_game(self):
         self.game_active = False
@@ -130,7 +132,7 @@ class AlienInvasion:
                 self.first = False
                 self.screen.fill(self.bg_color)
                 self.ship.update()
-                self.fleet.update()
+                self.fleet.update()  # Update the entire fleet of aliens
                 self.sb.show_score()
                 self.barriers.update()
 
@@ -144,9 +146,11 @@ class AlienInvasion:
                     self.high_scores_button.draw_button()
                     self.draw_title()  # Draw the title when the game is inactive
 
+        # Refresh the screen and regulate the game loop speed
             pg.display.flip()
             self.clock.tick(60)
-        sys.exit()
+        sys.exit()  # Exit the game after the main loop finishes
+
 
     def check_high_score(self, new_score):
         """Check if the new score is a high score and update the list."""
@@ -154,6 +158,7 @@ class AlienInvasion:
             self.high_scores.append(new_score)
             self.high_scores = sorted(self.high_scores, reverse=True)[:5]  # Keep only top 5
             self.save_high_scores()  # Save the updated high scores
+
 
 if __name__ == '__main__':
     ai = AlienInvasion()
