@@ -31,10 +31,17 @@ class Event:
                 self._check_play_button(mouse_pos)
 
     def _check_play_button(self, mouse_pos):
-        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
-        if button_clicked and not self.game_active:
+        # Check if the play button is clicked
+        play_button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        if play_button_clicked and not self.game_active:
             self.settings.initialize_dynamic_settings()
             self.ai_game.reset_game()
+
+        # Check if the high scores button is clicked
+        high_scores_button_clicked = self.ai_game.high_scores_button.rect.collidepoint(mouse_pos)
+        if high_scores_button_clicked and not self.game_active:
+            self.ai_game.showing_high_scores = True
+            self.ai_game.game_active = False  # Ensure the game doesn't start
 
     def _check_keydown_events(self, event):
         key = event.key
@@ -42,6 +49,11 @@ class Event:
             self.ship.v += self.settings.ship_speed * Event.di[key]
         elif event.key == pg.K_SPACE:
             self.ship.open_fire()
+        elif key == pg.K_ESCAPE:
+            # If the high scores screen is active, pressing Escape returns to the main menu
+            if self.ai_game.showing_high_scores:
+                self.ai_game.showing_high_scores = False
+                pg.mouse.set_visible(True)
         elif event.type == pg.KEYUP:
             if event.key in Event.di.keys():
                 self.ship.v = Vector()
@@ -53,5 +65,3 @@ class Event:
             self.ship.v = Vector()
         elif event.key == pg.K_SPACE:
             self.ship.cease_fire()
-
- 
