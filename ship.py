@@ -87,11 +87,11 @@ class Ship(Sprite):
             self.ai_game.game_over()
 
     def fire_laser(self):
-        """Fire a laser."""
+        """Fire a laser from the ship."""
         self.fired += 1
         if self.fired % self.settings.ship_fire_every != 0: 
             return
-        laser = Laser(self.ai_game)
+        laser = Laser(self.ai_game, position=self.rect.midtop, direction=-1)  # Laser going up
         self.lasers.add(laser)
 
     def open_fire(self): 
