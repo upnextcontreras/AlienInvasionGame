@@ -17,18 +17,29 @@ from sound import Sound
 class AlienInvasion:
     def __init__(self):
         pg.init()   
+
+
         self.clock = pg.time.Clock()
+
+        screen_info = pg.display.Info()
+        screen_width, screen_height = screen_info.current_w, screen_info.current_h
+
         self.settings = Settings()
+        self.settings.w_h = (screen_width, screen_height) 
         self.screen = pg.display.set_mode(self.settings.w_h)
+        
         self.stats = GameStats(self)
         self.sb = Scoreboard(self)
         self.sound = Sound()
+
+        self.alien_lasers = pg.sprite.Group()  # Group to hold alien lasers
 
         self.ship = Ship(ai_game=self)
         self.fleet = Fleet(ai_game=self)  # Instantiate AlienFleet instead of Fleet
         self.ship.set_fleet(self.fleet)
         self.ship.set_sb(self.sb)
         self.barriers = Barriers(ai_game=self)
+
 
         pg.display.set_caption("Alien Invasion")
         self.bg_color = self.settings.bg_color
@@ -111,6 +122,7 @@ class AlienInvasion:
         self.ship.reset_ship()
         self.fleet.aliens.empty()
         self.fleet.create_fleet()  # Reset the alien fleet
+        self.alien_lasers.empty()
         pg.mouse.set_visible(False)
 
 
@@ -143,6 +155,21 @@ class AlienInvasion:
                 # Adjust the music speed based on the remaining aliens
                 self.sound.adjust_music_speed(remaining_aliens, total_aliens)
 
+                # Update alien lasers
+                self.alien_lasers.update()
+
+                # Check for collisions between alien lasers and the player's ship
+                if pg.sprite.spritecollideany(self.ship, self.alien_lasers):
+                    self.ship.ship_hit()  # If a laser hits the ship, ship loses a life
+
+                # Update and draw all lasers (ship and alien)
+                self.ship.lasers.update()
+                for laser in self.ship.lasers.sprites():
+                    laser.draw()
+
+                for laser in self.alien_lasers.sprites():
+                    laser.draw()
+
             # If not active, display the main menu or high scores
             if not self.game_active:
                 if self.showing_high_scores:
@@ -158,6 +185,7 @@ class AlienInvasion:
             self.clock.tick(60)
 
         sys.exit()  # Exit the game after the main loop finishes
+
 
 
     def check_high_score(self, new_score):
