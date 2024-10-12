@@ -1,7 +1,6 @@
 import pygame as pg
 from vector import Vector
-from point import Point
-from laser import Laser 
+from laser import Laser  # Make sure Laser is imported here
 from pygame.sprite import Sprite
 from timer import Timer
 from random import randint
@@ -33,14 +32,26 @@ class Alien(Sprite):
         self.dying = False
         self.dead = False
 
+        self.laser_timer = randint(200, 500)  # Adjusted random timer for firing lasers (lower values for faster shooting)
+
     def check_edges(self):
         sr = self.screen.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
         return self.x + self.rect.width >= sr.right or self.x <= 0
 
+    def fire_laser(self):
+        """Alien fires a laser."""
+        if self.laser_timer <= 0:
+            # Fire a laser from the alien's position and reset the timer
+            new_laser = Laser(self.ai_game, position=self.rect.midbottom, direction=1, color=(255, 0, 0))  # Red laser going down
+            self.ai_game.alien_lasers.add(new_laser)
+            self.laser_timer = randint(200, 500)  # Reset the laser timer to a new random interval (faster firing)
+        else:
+            self.laser_timer -= 1
+
     def update(self):
-        """Update the alien's position and adjust its speed dynamically."""
+        """Update the alien's position and attempt to fire lasers."""
         remaining_aliens = len(self.ai_game.fleet.aliens)  # Get the number of remaining aliens
 
         # Increase velocity as the number of remaining aliens decreases
@@ -48,6 +59,8 @@ class Alien(Sprite):
 
         self.x += self.v.x * speed_multiplier
         self.y += self.v.y * speed_multiplier
+
+        self.fire_laser()  # Alien attempts to fire a laser during its update cycle
 
         self.image = self.timer.current_image()
         self.draw()
@@ -57,13 +70,8 @@ class Alien(Sprite):
         self.rect.y = self.y
         self.screen.blit(self.image, self.rect)
 
-
 def main():
     print('\n run from alien_invasions.py\n')
 
 if __name__ == "__main__":
     main()
-
-
-
-
