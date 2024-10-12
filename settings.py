@@ -5,7 +5,7 @@ class Settings:
         self.scr_width = 1200
         self.scr_height = 800
         self.bg_color = DARK_GREY
-        self.w_h = (self.scr_width, self.scr_height)
+        self.width_height = (self.scr_width, self.scr_height)
 
         # laser settings
         self.laser_speed = 3.0

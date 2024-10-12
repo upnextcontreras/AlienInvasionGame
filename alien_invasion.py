@@ -18,16 +18,15 @@ class AlienInvasion:
     def __init__(self):
         pg.init()   
 
-
         self.clock = pg.time.Clock()
 
         screen_info = pg.display.Info()
-        screen_width, screen_height = screen_info.current_w, screen_info.current_h
+        #screen_width, screen_height = screen_info.current_w, screen_info.current_h
 
         self.settings = Settings()
-        self.settings.w_h = (screen_width, screen_height) 
-        self.screen = pg.display.set_mode(self.settings.w_h)
-        
+        self.settings.w_h = (self.settings.scr_width, self.settings.scr_height)
+        self.screen = pg.display.set_mode(self.settings.w_h)  # Edited this for bugs
+
         self.stats = GameStats(self)
         self.sb = Scoreboard(self)
         self.sound = Sound()
@@ -40,9 +39,12 @@ class AlienInvasion:
         self.ship.set_sb(self.sb)
         self.barriers = Barriers(ai_game=self)
 
-
         pg.display.set_caption("Alien Invasion")
-        self.bg_color = self.settings.bg_color
+
+        # Load background images for menu, highscore and game
+        self.menu_bg_image = pg.transform.scale(pg.image.load("images\menu_background.png"), (self.settings.w_h))
+        self.game_bg_image = pg.transform.scale(pg.image.load("images\game_background.png"), (self.settings.w_h))
+        self.highscore_bg_image = pg.transform.scale(pg.image.load("images\highscore_background.png"), (self.settings.w_h))
 
         # Start Alien Invasion in an inactive state.
         self.game_active = False
@@ -55,9 +57,9 @@ class AlienInvasion:
 
         self.event = Event(self)
 
-        # Set up title font and text
+        # Set up title font and text {Used PNG here for aesthetics - kris}
         self.title_font = pg.font.SysFont(None, 72)
-        self.title_text = self.title_font.render("Alien Invasion", True, OFF_WHITE)
+        #self.title_text = self.title_font.render("Alien Invasion", True, OFF_WHITE)
 
         # Load high scores from file
         self.high_scores = self.load_high_scores()
@@ -76,24 +78,24 @@ class AlienInvasion:
             json.dump(self.high_scores, file)  # Save the scores in JSON format
 
     # Add a method to display the title
-    def draw_title(self):
-        title_rect = self.title_text.get_rect()
-        title_rect.centerx = self.screen.get_rect().centerx
-        title_rect.top = 100  # Positioning it near the top of the screen
-        self.screen.blit(self.title_text, title_rect)
+    #def draw_title(self): {Used PNG here for aesthetics - Kris}
+        #title_rect = self.title_text.get_rect()
+        #title_rect.centerx = self.screen.get_rect().centerx
+        #title_rect.top = 100  # Positioning it near the top of the screen
+        #self.screen.blit(self.title_text, title_rect)
 
     def draw_high_scores(self):
         """Display the high scores on the screen."""
-        self.screen.fill(self.bg_color)
+        self.screen.blit(self.highscore_bg_image, (0, 0))
         title_text = self.title_font.render("High Scores", True, OFF_WHITE)
-        title_rect = title_text.get_rect(center=(self.settings.w_h[0] // 2, 100))
+        title_rect = title_text.get_rect(center=(600, 300))
         self.screen.blit(title_text, title_rect)
 
         # Display each high score
         font = pg.font.SysFont(None, 48)
         for i, score in enumerate(self.high_scores):
             score_text = font.render(f"{i + 1}. {score}", True, OFF_WHITE)
-            score_rect = score_text.get_rect(center=(self.settings.w_h[0] // 2, 200 + i * 50))
+            score_rect = score_text.get_rect(center=(600, 360 + i * 50))
             self.screen.blit(score_text, score_rect)
 
     def game_over(self):
@@ -125,7 +127,6 @@ class AlienInvasion:
         self.alien_lasers.empty()
         pg.mouse.set_visible(False)
 
-
     def restart_game(self):
         self.game_active = False
         self.first = True
@@ -142,27 +143,22 @@ class AlienInvasion:
             # If the game is active, update the game objects and display the screen
             if self.first or self.game_active:
                 self.first = False
-                self.screen.fill(self.bg_color)
+                self.screen.blit(self.game_bg_image, (0, 0))  # Draw game background
                 self.ship.update()
                 self.fleet.update()  # Update the entire fleet of aliens
                 self.sb.show_score()
                 self.barriers.update()
 
-                # Assuming `fleet.aliens` is a sprite group that contains the aliens
                 remaining_aliens = len(self.fleet.aliens)
-                total_aliens = self.fleet.total_aliens  # Track total aliens when creating the fleet
+                total_aliens = self.fleet.total_aliens
 
-                # Adjust the music speed based on the remaining aliens
                 self.sound.adjust_music_speed(remaining_aliens, total_aliens)
 
-                # Update alien lasers
                 self.alien_lasers.update()
 
-                # Check for collisions between alien lasers and the player's ship
                 if pg.sprite.spritecollideany(self.ship, self.alien_lasers):
-                    self.ship.ship_hit()  # If a laser hits the ship, ship loses a life
+                    self.ship.ship_hit()
 
-                # Update and draw all lasers (ship and alien)
                 self.ship.lasers.update()
                 for laser in self.ship.lasers.sprites():
                     laser.draw()
@@ -175,26 +171,15 @@ class AlienInvasion:
                 if self.showing_high_scores:
                     self.draw_high_scores()  # Display high scores
                 else:
-                    self.screen.fill(self.bg_color)  # Ensure background color is filled
+                    self.screen.blit(self.menu_bg_image, (0, 0))  # Draw menu background
                     self.play_button.draw_button()
                     self.high_scores_button.draw_button()
-                    self.draw_title()  # Draw the title when the game is inactive
 
             # Refresh the screen and regulate the game loop speed
             pg.display.flip()
             self.clock.tick(60)
 
         sys.exit()  # Exit the game after the main loop finishes
-
-
-
-    def check_high_score(self, new_score):
-        """Check if the new score is a high score and update the list."""
-        if new_score > min(self.high_scores):
-            self.high_scores.append(new_score)
-            self.high_scores = sorted(self.high_scores, reverse=True)[:5]  # Keep only top 5
-            self.save_high_scores()  # Save the updated high scores
-
 
 if __name__ == '__main__':
     ai = AlienInvasion()
