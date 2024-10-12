@@ -36,9 +36,12 @@ class Ship(Sprite):
         self.explosion_images = [pg.image.load(f'images_other/ship_boom{n}.png') for n in range(3)]  # Replace with your actual explosion frames
         self.explosion_timer = Timer(images=self.explosion_images, delta=100, loop_continuously=False)  # Timer to control animation
 
-        # Flags to manage state
+         # Flags to manage state
         self.dying = False  # Ship is hit but animation still running
         self.dead = False    # Ship is completely destroyed
+        self.invincible = False  # Add flag for invincibility after hit
+        self.invincibility_duration = 2000  # Set invincibility to 2 seconds (2000 ms)
+        self.invincibility_start_time = 0  # Track the time when invincibility starts
 
     def set_fleet(self, fleet): 
         self.fleet = fleet
@@ -47,17 +50,8 @@ class Ship(Sprite):
         self.sb = sb
 
     def reset_ship(self):
-        """Reset the ship to its starting position and state."""
-        self.lasers.empty()  # Clear any active lasers
-        self.center_ship()  # Reset the ship's position to the center
-
-        # Reset ship state variables
-        self.dying = False  # The ship is no longer dying
-        self.dead = False   # The ship is no longer dead
-
-        # Reset the ship's image to its original state
-        self.image = pg.image.load('images/ship.bmp')  # Load the original ship image
-
+        self.lasers.empty()
+        self.center_ship()
 
     def center_ship(self):         
         self.rect.midbottom = self.screen_rect.midbottom
@@ -71,7 +65,7 @@ class Ship(Sprite):
 
     def ship_hit(self):
         """Handle when the ship is hit."""
-        if self.stats.ships_left > 0:
+        if not self.invincible and self.stats.ships_left > 0:  # Check if the ship is not invincible
             self.stats.ships_left -= 1
             print(f"Only {self.stats.ships_left} ships left now")
             self.sb.prep_ships()
@@ -85,7 +79,11 @@ class Ship(Sprite):
             self.fleet.aliens.empty()
 
             sleep(0.5)  # Brief delay before resetting
-        else:
+
+            # Set invincibility after getting hit
+            self.invincible = True
+            self.invincibility_start_time = pg.time.get_ticks()  # Get the time when invincibility starts
+        elif self.stats.ships_left == 0:
             self.ai_game.game_over()
 
     def fire_laser(self):
@@ -107,6 +105,12 @@ class Ship(Sprite):
         if self.dying:
             self.handle_explosion()
             return  # Skip movement and firing when the ship is dying
+
+        # Manage invincibility timeout
+        if self.invincible:
+            current_time = pg.time.get_ticks()
+            if current_time - self.invincibility_start_time > self.invincibility_duration:
+                self.invincible = False  # Disable invincibility after the duration
 
         self.x += self.v.x 
         self.y += self.v.y
@@ -146,7 +150,7 @@ class Ship(Sprite):
             self.reset_ship()  # Reset the ship's position and state
 
             # Reset the ship's image to its original state
-            self.image = pg.image.load('images/ship.bmp')  # Reset to the original ship image
+        self.image = pg.image.load('images/ship.bmp')  # Reset to the original ship image
 
 
 def main():
