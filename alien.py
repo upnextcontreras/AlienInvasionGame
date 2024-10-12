@@ -1,3 +1,10 @@
+'''
+
+Space Invaders Project CPSC386 
+Christopher Contreras
+Kristian Losenara
+
+ '''
 import pygame as pg
 from vector import Vector
 from laser import Laser  # Make sure Laser is imported here
@@ -11,28 +18,33 @@ class Alien(Sprite):
     alien_images2 = [pg.image.load(f"images/alien2{n}.png") for n in range(2)]
     alien_images = [alien_images0, alien_images1, alien_images2]
 
+
     def __init__(self, ai_game, v): 
         super().__init__()
         self.ai_game = ai_game
         self.screen = ai_game.screen
         self.v = v  # Base velocity of the alien
 
-        type = randint(0, 2)
-        self.timer = Timer(images=Alien.alien_images[type], delta=(type+1)*600, start_index=type % 2)
+        self.type = randint(0, 2)  # Get alien type and assign it to self.type
+
+        self.timer = Timer(images=Alien.alien_images[self.type], delta=(self.type + 1) * 600, start_index=self.type % 2)
 
         self.image = self.timer.current_image()
         self.rect = self.image.get_rect()
 
         self.rect.x = self.rect.width
         self.rect.y = self.rect.height
-        
+
         self.x = float(self.rect.x)
         self.y = float(self.rect.y)
 
         self.dying = False
         self.dead = False
 
-        self.laser_timer = randint(200, 500)  # Adjusted random timer for firing lasers (lower values for faster shooting)
+        self.laser_timer = randint(200, 500)  # Adjusted random timer for firing lasers
+
+        # Initialize explosion timer
+        #self.explosion_timer = Timer(images=self.explosion_images, delta=100, start_index=0)  # Set explosion timer
 
     def check_edges(self):
         sr = self.screen.get_rect()
@@ -51,19 +63,38 @@ class Alien(Sprite):
             self.laser_timer -= 1
 
     def update(self):
-        """Update the alien's position and attempt to fire lasers."""
-        remaining_aliens = len(self.ai_game.fleet.aliens)  # Get the number of remaining aliens
+        """Update the alien's position and attempt to fire lasers, handle explosion if needed."""
+        if self.dying:
+            self.handle_explosion()  # Handle the explosion if alien is dying
+        else:
+            remaining_aliens = len(self.ai_game.fleet.aliens)  # Get the number of remaining aliens
 
-        # Increase velocity as the number of remaining aliens decreases
-        speed_multiplier = max(1, 5 - remaining_aliens // 10)  # Example logic: speed up as the number of aliens drops
+            # Increase velocity as the number of remaining aliens decreases
+            speed_multiplier = max(1, 5 - remaining_aliens // 10)  # Example logic: speed up as the number of aliens drops
 
-        self.x += self.v.x * speed_multiplier
-        self.y += self.v.y * speed_multiplier
+            self.x += self.v.x * speed_multiplier
+            self.y += self.v.y * speed_multiplier
 
-        self.fire_laser()  # Alien attempts to fire a laser during its update cycle
+            self.fire_laser()  # Alien attempts to fire a laser during its update cycle
 
-        self.image = self.timer.current_image()
-        self.draw()
+            self.image = self.timer.current_image()
+            self.draw()
+
+    def handle_explosion(self):
+        """Handle the explosion animation and remove the alien after it's done."""
+        if not self.explosion_timer.finished():
+            self.image = self.explosion_images[self.explosion_timer.current_index()]  # Use explosion images
+            self.screen.blit(self.image, self.rect)  # Draw the explosion frame
+            self.explosion_timer.update()  # Update the explosion timer
+        else:
+            self.dead = True  # Mark the alien as dead
+            self.ai_game.stats.score += self.point_value  # Add the point value to the score
+            self.kill()  # Remove the alien from the sprite group
+
+    def trigger_explosion(self):
+        """Trigger the explosion animation when the alien is hit."""
+        self.dying = True  # Mark the alien as dying
+        self.explosion_timer.reset()  # Reset the explosion timer to start from the first frame    
 
     def draw(self): 
         self.rect.x = self.x

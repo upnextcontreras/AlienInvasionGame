@@ -3,7 +3,7 @@ from vector import Vector
 from laser import Laser
 from time import sleep
 from pygame.sprite import Sprite
-from timer import Timer  # Assuming you have a Timer class to manage frame animations
+from timer import Timer  
 from sound import Sound
 
 class Ship(Sprite):
@@ -18,7 +18,7 @@ class Ship(Sprite):
         self.sb = None
 
         # Load the ship image created using a pixel editor
-        self.image = pg.image.load('images/ship.bmp')  # Replace with your pixel art ship image
+        self.image = pg.image.load('images/ship.png')  # Replace with your pixel art ship image
         self.rect = self.image.get_rect()
         self.rect.midbottom = self.screen_rect.midbottom
 
@@ -35,8 +35,8 @@ class Ship(Sprite):
         self.fired = 0
 
         # Explosion animation frames (8-12 frames)
-        self.explosion_images = [pg.image.load(f'images_other/ship_boom{n}.png') for n in range(3)]  # Replace with your actual explosion frames
-        self.explosion_timer = Timer(images=self.explosion_images, delta=100, loop_continuously=False)  # Timer to control animation
+        self.explosion_images = [pg.image.load(f'images_other/ship_boom_frames/frame_0{n}.png') for n in range(11)]  # Replace with your actual explosion frames
+        self.explosion_timer = Timer(images=self.explosion_images, delta=30, loop_continuously=False)  # Timer to control animation
 
          # Flags to manage state
         self.dying = False  # Ship is hit but animation still running
@@ -54,6 +54,7 @@ class Ship(Sprite):
     def reset_ship(self):
         self.lasers.empty()
         self.center_ship()
+        self.ai_game.ship_hit_flag = False  # Reset the ship hit flag
 
     def center_ship(self):         
         self.rect.midbottom = self.screen_rect.midbottom
@@ -74,8 +75,10 @@ class Ship(Sprite):
 
             # Trigger the ship explosion animation
             self.dying = True
-            self.sound.play_explosion()
             self.explosion_timer.reset()  # Reset the explosion animation to start from the first frame
+
+            # Set the ship hit flag to True so we can prevent level-up
+            self.ai_game.ship_hit_flag = True
 
             # Clear lasers and fleet while the ship is resetting
             self.lasers.empty()
@@ -96,6 +99,7 @@ class Ship(Sprite):
             return
         laser = Laser(self.ai_game, position=self.rect.midtop, direction=-1)  # Laser going up
         self.lasers.add(laser)
+        self.sound.play_laser()
 
     def open_fire(self): 
         self.firing = True
@@ -148,12 +152,13 @@ class Ship(Sprite):
             self.screen.blit(self.image, self.rect)  # Draw the explosion frame
         else:
             # Once the explosion finishes, reset the ship
+            self.sound.play_explosion() #put explosion here to better line up 
             self.dying = False
             self.dead = True
             self.reset_ship()  # Reset the ship's position and state
 
             # Reset the ship's image to its original state
-        self.image = pg.image.load('images/ship.bmp')  # Reset to the original ship image
+        self.image = pg.image.load('images/ship.png')  # Reset to the original ship image
 
 
 def main():

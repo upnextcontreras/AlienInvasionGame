@@ -64,6 +64,8 @@ class AlienInvasion:
         # Load high scores from file
         self.high_scores = self.load_high_scores()
 
+        
+
         # Load menu music
         self.menu_music_file = "sounds/menu_music.wav"  # Path to your menu music file
         pg.mixer.music.load(self.menu_music_file)
@@ -112,7 +114,7 @@ class AlienInvasion:
 
         # Set game to inactive, so it will return to the main menu
         self.game_active = False
-        self.first = True  # Ensure the main menu gets displayed again
+        self.first = True  # Ensure the main menu and its music gets displayed again
         pg.mixer.music.load(self.menu_music_file)
         pg.mixer.music.play()
 

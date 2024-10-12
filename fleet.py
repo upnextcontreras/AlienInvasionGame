@@ -1,7 +1,9 @@
 import pygame as pg
 from vector import Vector
 from alien import Alien
+from time import sleep
 from pygame.sprite import Sprite
+from sound import Sound
 
 class Fleet(Sprite):
     def __init__(self, ai_game): 
@@ -10,6 +12,7 @@ class Fleet(Sprite):
         self.ship = ai_game.ship
         self.aliens = pg.sprite.Group()  # Group to hold the alien sprites
         self.fleet_lasers = pg.sprite.Group()  # Group for fleet's lasers
+        self.sound = Sound()
         self.settings = ai_game.settings
         self.stats = ai_game.stats
         self.sb = ai_game.sb
@@ -81,13 +84,11 @@ class Fleet(Sprite):
             self.sb.prep_score()
             self.sb.check_high_score()
 
-        # If all aliens are destroyed, reset fleet and level up
+    # If all aliens are destroyed and the ship wasn't hit, level up #need to check cond here 
         if not self.aliens:
             self.ship.lasers.empty()
             self.create_fleet()
-
-            # Increase level.
-            self.stats.level += 1
+            self.stats.level += 1  # Increase level
             self.sb.prep_level()
             return
 
