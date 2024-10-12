@@ -6,19 +6,20 @@ class Laser(Sprite):
     @staticmethod
     def random_color(): 
         return (randint(0, 255), randint(0, 255), randint(0, 255))
-    def __init__(self, ai_game):
+
+    def __init__(self, ai_game, position, direction=-1, color=None):  # Add direction and color as parameters
         super().__init__()
         self.screen = ai_game.screen
         self.settings = ai_game.settings
-        # self.color = self.settings.laser_color
-        self.color = Laser.random_color()
-        self.rect = pg.Rect(0, 0, self.settings.laser_width,
-                                self.settings.laser_height)
-        self.rect.midtop = ai_game.ship.rect.midtop
+        self.color = color if color else Laser.random_color()  # Default to random color if none is provided
+        self.rect = pg.Rect(0, 0, self.settings.laser_width, self.settings.laser_height)
+        self.rect.midtop = position  # Use the passed position for laser placement
         self.y = float(self.rect.y)
+        self.direction = direction  # -1 for up, 1 for down (aliens)
 
     def update(self):
-        self.y -= self.settings.laser_speed
+        """Move the laser up or down based on the direction."""
+        self.y += self.settings.laser_speed * self.direction
         self.rect.y = self.y
 
     def draw(self):
