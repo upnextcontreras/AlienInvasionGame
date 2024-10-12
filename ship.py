@@ -4,6 +4,7 @@ from laser import Laser
 from time import sleep
 from pygame.sprite import Sprite
 from timer import Timer  # Assuming you have a Timer class to manage frame animations
+from sound import Sound
 
 class Ship(Sprite):
     def __init__(self, ai_game, v=Vector()):
@@ -13,6 +14,7 @@ class Ship(Sprite):
         self.screen_rect = ai_game.screen.get_rect()
         self.stats = ai_game.stats
         self.settings = ai_game.settings
+        self.sound = Sound()
         self.sb = None
 
         # Load the ship image created using a pixel editor
@@ -72,6 +74,7 @@ class Ship(Sprite):
 
             # Trigger the ship explosion animation
             self.dying = True
+            self.sound.play_explosion()
             self.explosion_timer.reset()  # Reset the explosion animation to start from the first frame
 
             # Clear lasers and fleet while the ship is resetting

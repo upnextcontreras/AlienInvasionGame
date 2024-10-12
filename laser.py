@@ -1,6 +1,7 @@
 import pygame as pg
 from pygame.sprite import Sprite
 from random import randint
+from settings import Settings
 
 class Laser(Sprite):
     @staticmethod
@@ -11,7 +12,7 @@ class Laser(Sprite):
         super().__init__()
         self.screen = ai_game.screen
         self.settings = ai_game.settings
-        self.color = color if color else Laser.random_color()  # Default to random color if none is provided
+        self.color =  self.settings.laser_color
         self.rect = pg.Rect(0, 0, self.settings.laser_width, self.settings.laser_height)
         self.rect.midtop = position  # Use the passed position for laser placement
         self.y = float(self.rect.y)

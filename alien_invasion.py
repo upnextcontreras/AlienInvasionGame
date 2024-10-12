@@ -64,6 +64,10 @@ class AlienInvasion:
         # Load high scores from file
         self.high_scores = self.load_high_scores()
 
+        # Load menu music
+        self.menu_music_file = "sounds/menu_music.wav"  # Path to your menu music file
+        pg.mixer.music.load(self.menu_music_file)
+
     def load_high_scores(self):
         """Load high scores from a file."""
         try:
@@ -84,7 +88,7 @@ class AlienInvasion:
         #title_rect.top = 100  # Positioning it near the top of the screen
         #self.screen.blit(self.title_text, title_rect)
 
-    def draw_high_scores(self):
+    def draw_high_scores(self): 
         """Display the high scores on the screen."""
         self.screen.blit(self.highscore_bg_image, (0, 0))
         title_text = self.title_font.render("High Scores", True, OFF_WHITE)
@@ -106,7 +110,11 @@ class AlienInvasion:
         if self.stats.score > min(self.high_scores):
             self.check_high_score(self.stats.score)
 
-        self.restart_game()  # Restart or ask to play again
+        # Set game to inactive, so it will return to the main menu
+        self.game_active = False
+        self.first = True  # Ensure the main menu gets displayed again
+        pg.mixer.music.load(self.menu_music_file)
+        pg.mixer.music.play()
 
     def check_high_score(self, new_score):
         """Check if the new score is a high score and update the list."""
@@ -123,9 +131,9 @@ class AlienInvasion:
 
         self.ship.reset_ship()
         self.fleet.aliens.empty()
-        self.fleet.create_fleet()  # Reset the alien fleet
+        self.fleet.create_fleet()  # Reset thew alien fleet
         self.alien_lasers.empty()
-        pg.mouse.set_visible(False)
+        pg.mouse.set_visible(True)
 
     def restart_game(self):
         self.game_active = False
@@ -137,6 +145,9 @@ class AlienInvasion:
         self.finished = False
         self.first = True
         self.game_active = False
+
+        pg.mixer.music.play() #play main menu music
+
         while not self.finished:
             self.finished = self.event.check_events()
 

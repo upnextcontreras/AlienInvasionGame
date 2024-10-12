@@ -4,14 +4,17 @@ import time
 
 class Sound:
     def __init__(self): 
+
         self.pickup = pg.mixer.Sound('sounds/pickup.wav')
         self.gameover = pg.mixer.Sound('sounds/gameover.wav')
+        self.ship_damage = pg.mixer.Sound('sounds/ship_damage.wav')
+        self.menu_music = pg.mixer.Sound('sounds/menu_music.wav')
 
         # Load different versions of the background music at different speeds
         self.normal_music = 'sounds/FE.mp3'
         self.fast_music = 'sounds/FE1.mp3'
         self.faster_music = 'sounds/FE2.mp3'
-
+        self.ship_explosion = 'sounds/ship_damage.wav'
         self.current_music = self.normal_music  # Start with the normal music
         self.music_playing = False
 
@@ -20,10 +23,16 @@ class Sound:
         pg.mixer.music.set_volume(0.2)
         pg.mixer.music.play(-1, 0.0)  # Loop indefinitely
         self.music_playing = True
-        
+
     def play_pickup(self): 
         if self.music_playing: 
             self.pickup.play()
+    
+    def play_explosion(self):
+        self.ship_damage.play()
+
+    def play_menu_music(self):
+        self.menu_music.play()
         
     def play_gameover(self):
         if self.music_playing: 

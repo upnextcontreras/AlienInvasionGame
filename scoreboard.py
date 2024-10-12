@@ -1,6 +1,8 @@
 import pygame.font
 from pygame.sprite import Group
 from ship import Ship
+from colors import OFF_WHITE
+import pygame as pg
 
 class Scoreboard:
     def __init__(self, ai_game):
@@ -28,8 +30,8 @@ class Scoreboard:
                 self.text_color, self.settings.bg_color)
 
         self.score_rect = self.score_image.get_rect()
-        self.score_rect.right = self.screen_rect.right - 20
-        self.score_rect.top = 20
+        self.score_rect.right = self.screen_rect.right - 70
+        self.score_rect.top = 15
 
     def prep_high_score(self):
         high_score = round(self.stats.high_score, -1)
@@ -48,7 +50,7 @@ class Scoreboard:
 
         self.level_rect = self.level_image.get_rect()
         self.level_rect.right = self.score_rect.right
-        self.level_rect.top = self.score_rect.bottom + 10
+        self.level_rect.top = self.score_rect.bottom + 8
 
     def prep_ships(self):
         self.ships = Group()
@@ -64,6 +66,13 @@ class Scoreboard:
             self.prep_high_score()
 
     def show_score(self):
+        self.title_font = pg.font.SysFont(None, 50)
+        score_text = self.title_font.render("Score:", True, OFF_WHITE)
+        score_rect = score_text.get_rect(center=(1000, 30))
+        self.screen.blit(score_text, score_rect)
+        score_text = self.title_font.render("Level:", True, OFF_WHITE) #hate how this is done, but works. 
+        score_rect = score_text.get_rect(center=(1000, 70))
+        self.screen.blit(score_text, score_rect)
         self.screen.blit(self.score_image, self.score_rect)
         self.screen.blit(self.high_score_image, self.high_score_rect)
         self.screen.blit(self.level_image, self.level_rect)

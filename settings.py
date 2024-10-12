@@ -1,17 +1,17 @@
-from colors import DARK_GREY, RED
+from colors import DARK_GREY, RED, WHITE
 
 class Settings:
     def __init__(self):
         self.scr_width = 1200
         self.scr_height = 800
-        self.bg_color = DARK_GREY
+        self.bg_color = WHITE
         self.width_height = (self.scr_width, self.scr_height)
 
         # laser settings
-        self.laser_speed = 3.0
-        self.laser_width = 10
+        self.laser_speed = 10
+        self.laser_width = 5
         self.laser_height = 15
-        self.laser_color = RED
+        self.laser_color = WHITE
 
         self.ship_limit = 3
         self.ship_fire_every = 10
