@@ -136,6 +136,13 @@ class AlienInvasion:
                 self.sb.show_score()
                 self.barriers.update()
 
+                # Assuming `fleet.aliens` is a sprite group that contains the aliens
+                remaining_aliens = len(self.fleet.aliens)
+                total_aliens = self.fleet.total_aliens  # Track total aliens when creating the fleet
+
+                # Adjust the music speed based on the remaining aliens
+                self.sound.adjust_music_speed(remaining_aliens, total_aliens)
+
             # If not active, display the main menu or high scores
             if not self.game_active:
                 if self.showing_high_scores:
@@ -146,9 +153,10 @@ class AlienInvasion:
                     self.high_scores_button.draw_button()
                     self.draw_title()  # Draw the title when the game is inactive
 
-        # Refresh the screen and regulate the game loop speed
+            # Refresh the screen and regulate the game loop speed
             pg.display.flip()
             self.clock.tick(60)
+
         sys.exit()  # Exit the game after the main loop finishes
 
 
