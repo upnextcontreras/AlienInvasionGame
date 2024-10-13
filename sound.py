@@ -11,6 +11,7 @@ class Sound:
         self.ship_damage = pg.mixer.Sound('sounds/ship_damage.wav')
         self.menu_music = pg.mixer.Sound('sounds/menu_music.wav')
         self.laser_sound = pg.mixer.Sound('sounds/laser_sound.wav')
+        self.aliendeath = pg.mixer.Sound('sounds/aliendeath.wav')
 
         # Load different versions of the background music at different speeds
         self.normal_music = 'sounds/FE.mp3'
@@ -34,6 +35,9 @@ class Sound:
     
     def play_explosion(self):
         self.ship_damage.play()
+
+    def play_aliendeath(self):
+        self.aliendeath.play()
 
     def play_levelup(self):
         self.levelup.play()

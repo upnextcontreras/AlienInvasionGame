@@ -44,7 +44,8 @@ class Alien(Sprite):
         self.laser_timer = randint(200, 500)  # Adjusted random timer for firing lasers
 
         # Initialize explosion timer
-        #self.explosion_timer = Timer(images=self.explosion_images, delta=100, start_index=0)  # Set explosion timer
+        self.explosion_images = [pg.image.load(f'images_other/alien_boom_frames/explosion{n}.png') for n in range(6)]  # Replace with your actual explosion frames
+        self.explosion_timer = Timer(images=self.explosion_images, delta=1000, loop_continuously=False)  # Timer to control animation
 
     def check_edges(self):
         sr = self.screen.get_rect()
@@ -82,19 +83,10 @@ class Alien(Sprite):
 
     def handle_explosion(self):
         """Handle the explosion animation and remove the alien after it's done."""
-        if not self.explosion_timer.finished():
-            self.image = self.explosion_images[self.explosion_timer.current_index()]  # Use explosion images
+        if not self.explosion_timer.finished():  # If the explosion is still ongoing
+            self.image = self.explosion_timer.current_image()  # Get the current explosion frame
             self.screen.blit(self.image, self.rect)  # Draw the explosion frame
-            self.explosion_timer.update()  # Update the explosion timer
-        else:
-            self.dead = True  # Mark the alien as dead
-            self.ai_game.stats.score += self.point_value  # Add the point value to the score
-            self.kill()  # Remove the alien from the sprite group
-
-    def trigger_explosion(self):
-        """Trigger the explosion animation when the alien is hit."""
-        self.dying = True  # Mark the alien as dying
-        self.explosion_timer.reset()  # Reset the explosion timer to start from the first frame    
+  
 
     def draw(self): 
         self.rect.x = self.x

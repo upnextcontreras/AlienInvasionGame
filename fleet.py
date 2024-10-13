@@ -77,12 +77,20 @@ class Fleet(Sprite):
         """Update the position of the fleet and check for collisions."""
         # Check for collisions between ship lasers and aliens
         collisions = pg.sprite.groupcollide(self.ship.lasers, self.aliens, True, True)
-
+        alien = Alien(ai_game=self.ai_game, v=self.v)
         if collisions:
             for aliens in collisions.values():
+                for alien in self.aliens:
+                    print("ship should explode here")
+                    self.sound.play_aliendeath()
+                    #alien.handle_explosion()
+                alien.update()
+
                 self.stats.score += self.settings.alien_points * len(aliens)
             self.sb.prep_score()
             self.sb.check_high_score()
+                # Update each alien's state
+
 
     # If all aliens are destroyed and the ship wasn't hit, level up #need to check cond here 
         if not self.aliens:
